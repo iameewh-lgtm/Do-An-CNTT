@@ -29,22 +29,23 @@ namespace ĐồÁnCơSở.Hubs
             var currentUserId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrWhiteSpace(currentUserId))
             {
-                // Không tin hoàn toàn senderId từ JavaScript để tránh giả mạo người gửi.
                 senderId = currentUserId;
             }
 
-            if (string.IsNullOrWhiteSpace(senderId) || string.IsNullOrWhiteSpace(receiverId) || string.IsNullOrWhiteSpace(message))
+            if (string.IsNullOrWhiteSpace(senderId) ||
+                string.IsNullOrWhiteSpace(receiverId) ||
+                string.IsNullOrWhiteSpace(message))
             {
                 return;
             }
 
             message = message.Trim();
+
             if (message.Length > 2000)
             {
                 message = message.Substring(0, 2000);
             }
 
-            // 1. Lưu tin nhắn vào Database để có lịch sử
             var msg = new Message
             {
                 SenderId = senderId,
@@ -53,23 +54,21 @@ namespace ĐồÁnCơSở.Hubs
                 Timestamp = DateTime.Now,
                 IsAIResponse = false
             };
+
             _db.Messages.Add(msg);
             await _db.SaveChangesAsync();
 
-            // 2. Bắn tin nhắn qua cho người nhận nếu họ đang mở web
             await Clients.User(receiverId).SendAsync("ReceiveMessage", senderId, message);
-
-            // 3. Bắn ngược lại cho người gửi để hiện lên màn hình của họ
             await Clients.Caller.SendAsync("ReceiveMessage", senderId, message);
 
-            // 4. Nếu người nhận là AI_BOT thì trả lời tự động.
-            // Ưu tiên đọc Product/Category từ database trước, sau đó mới gọi GPT/Gemini cho câu hỏi hỗ trợ chung.
             if (receiverId == "AI_BOT")
             {
                 await Clients.Caller.SendAsync("BotTyping");
 
                 string? databaseReply = await TryGenerateDatabaseProductReplyAsync(message);
-                string aiReply = databaseReply ?? await _aiChatService.GenerateCustomerReplyAsync(message, Context.ConnectionAborted);
+
+                string aiReply = databaseReply
+                    ?? await _aiChatService.GenerateCustomerReplyAsync(message, Context.ConnectionAborted);
 
                 var aiMsg = new Message
                 {
@@ -79,6 +78,7 @@ namespace ĐồÁnCơSở.Hubs
                     Timestamp = DateTime.Now,
                     IsAIResponse = true
                 };
+
                 _db.Messages.Add(aiMsg);
                 await _db.SaveChangesAsync();
 
@@ -90,10 +90,22 @@ namespace ĐồÁnCơSở.Hubs
         private async Task<string?> TryGenerateDatabaseProductReplyAsync(string message)
         {
             var normalizedMessage = NormalizeText(message);
+
+            // Mấy câu này là hỏi cách dùng web, không được lôi sản phẩm trong DB ra trả lời.
+            if (IsSupportQuestion(normalizedMessage))
+            {
+                return null;
+            }
+
             var keywords = ExtractKeywords(normalizedMessage);
 
-            bool isProductQuestion = IsProductQuestion(normalizedMessage) || keywords.Count == 1;
-            if (!isProductQuestion && keywords.Count == 0)
+            bool isGeneralProductListQuestion = IsGeneralProductListQuestion(normalizedMessage);
+
+            bool isProductQuestion =
+                (IsSpecificProductLookupQuestion(normalizedMessage) && keywords.Count > 0)
+                || IsLikelySingleProductKeyword(keywords);
+
+            if (!isGeneralProductListQuestion && !isProductQuestion)
             {
                 return null;
             }
@@ -129,13 +141,17 @@ namespace ĐồÁnCơSở.Hubs
 
             if (matchedProducts.Any())
             {
-                return BuildProductReply(matchedProducts, message);
+                return BuildProductReply(matchedProducts);
             }
 
-            if (IsGeneralProductListQuestion(normalizedMessage))
+            if (isGeneralProductListQuestion)
             {
                 var topProducts = products.Take(5).ToList();
-                return BuildProductReply(topProducts, message, "Mình chưa thấy bạn nhập tên sản phẩm cụ thể, dưới đây là một vài sản phẩm đang có trong database:");
+
+                return BuildProductReply(
+                    topProducts,
+                    "Mình chưa thấy bạn nhập tên sản phẩm cụ thể, dưới đây là một vài sản phẩm đang có trong database:"
+                );
             }
 
             if (isProductQuestion)
@@ -146,33 +162,185 @@ namespace ĐồÁnCơSở.Hubs
             return null;
         }
 
-        private static bool IsProductQuestion(string normalizedMessage)
+        private static bool IsSupportQuestion(string normalizedMessage)
         {
-            string[] signals =
+            string[] supportSignals =
             {
-                "san pham", "tim", "mua", "gia", "bao nhieu", "con hang", "het hang",
-                "danh muc", "shop", "nguoi ban", "chi tiet", "mambo", "ao", "quan", "giay", "tui"
+                "cach dat hang",
+                "huong dan dat hang",
+                "lam sao dat hang",
+                "dat hang nhu the nao",
+                "mua hang nhu the nao",
+
+                "thanh toan vnpay",
+                "cach thanh toan",
+                "huong dan thanh toan",
+                "thanh toan nhu the nao",
+
+                "lien he admin",
+                "lien he nguoi ban",
+                "lien he shop",
+                "lien he ho tro",
+
+                "xem don hang",
+                "kiem tra don hang",
+                "theo doi don hang",
+                "don hang cua toi",
+
+                "thong tin tai khoan",
+                "doi mat khau",
+                "quen mat khau",
+                "dang nhap",
+                "dang ky",
+
+                "cach tim kiem san pham",
+                "huong dan tim kiem san pham",
+                "lam sao tim san pham",
+                "tim kiem san pham nhu the nao",
+                "cach tim san pham",
+                "tim san pham nhu the nao"
             };
-            return signals.Any(normalizedMessage.Contains);
+
+            return supportSignals.Any(normalizedMessage.Contains);
+        }
+
+        private static bool IsSpecificProductLookupQuestion(string normalizedMessage)
+        {
+            string[] lookupSignals =
+            {
+                "toi muon tim",
+                "minh muon tim",
+                "can tim",
+                "tim mua",
+                "muon mua",
+                "toi muon mua",
+                "minh muon mua",
+
+                "gia",
+                "bao nhieu",
+                "con hang",
+                "het hang",
+                "chi tiet",
+                "danh muc",
+                "nguoi ban",
+                "shop ban"
+            };
+
+            return lookupSignals.Any(normalizedMessage.Contains);
         }
 
         private static bool IsGeneralProductListQuestion(string normalizedMessage)
         {
             string[] signals =
             {
-                "co san pham gi", "san pham nao", "goi y san pham", "ban gi", "co gi ban", "xem san pham"
+                "co san pham gi",
+                "san pham nao",
+                "goi y san pham",
+                "ban gi",
+                "co gi ban",
+                "xem danh sach san pham",
+                "danh sach san pham"
             };
+
             return signals.Any(normalizedMessage.Contains);
+        }
+
+        private static bool IsLikelySingleProductKeyword(List<string> keywords)
+        {
+            if (keywords.Count != 1)
+            {
+                return false;
+            }
+
+            var nonProductWords = new HashSet<string>
+            {
+                "vnpay",
+                "cod",
+                "ship",
+                "shipping",
+                "google",
+                "login",
+                "logout",
+                "admin",
+                "account",
+                "password",
+                "email",
+                "sdt",
+                "phone",
+                "donhang",
+                "giohang",
+                "timkiem",
+                "sanpham"
+            };
+
+            return !nonProductWords.Contains(keywords[0]);
         }
 
         private static List<string> ExtractKeywords(string normalizedMessage)
         {
             var stopWords = new HashSet<string>
             {
-                "toi", "minh", "muon", "can", "tim", "kiem", "mua", "xem", "co", "khong",
-                "san", "pham", "hang", "hoa", "cai", "nay", "kia", "gi", "la", "bao", "nhieu",
-                "cho", "hoi", "ve", "cua", "ban", "shop", "admin", "lien", "he", "voi", "mot",
-                "nhung", "cac", "nhe", "a", "da", "dang", "duoc", "trong", "database"
+                "toi",
+                "minh",
+                "muon",
+                "can",
+                "tim",
+                "kiem",
+                "mua",
+                "xem",
+                "co",
+                "khong",
+                "san",
+                "pham",
+                "hang",
+                "hoa",
+                "cai",
+                "nay",
+                "kia",
+                "gi",
+                "la",
+                "bao",
+                "nhieu",
+                "cho",
+                "hoi",
+                "ve",
+                "cua",
+                "ban",
+                "shop",
+                "admin",
+                "lien",
+                "he",
+                "voi",
+                "mot",
+                "nhung",
+                "cac",
+                "nhe",
+                "a",
+                "da",
+                "dang",
+                "duoc",
+                "trong",
+                "database",
+                "cach",
+                "huong",
+                "dan",
+                "lam",
+                "sao",
+                "the",
+                "nao",
+                "thong",
+                "tin",
+                "tai",
+                "khoan",
+                "don",
+                "vnpay",
+                "cod",
+                "ship",
+                "google",
+                "login",
+                "logout",
+                "password",
+                "email"
             };
 
             return Regex.Matches(normalizedMessage, "[a-z0-9]+")
@@ -185,7 +353,10 @@ namespace ĐồÁnCơSở.Hubs
 
         private static int CalculateMatchScore(Product product, List<string> keywords, string normalizedMessage)
         {
-            if (keywords.Count == 0) return 0;
+            if (keywords.Count == 0)
+            {
+                return 0;
+            }
 
             var name = NormalizeText(product.Name ?? string.Empty);
             var description = NormalizeText(product.Description ?? string.Empty);
@@ -193,25 +364,48 @@ namespace ĐồÁnCơSở.Hubs
             var seller = NormalizeText(product.Seller?.Name ?? string.Empty);
 
             int score = 0;
+
             foreach (var keyword in keywords)
             {
-                if (name == keyword) score += 100;
-                if (name.Contains(keyword)) score += 60;
-                if (category.Contains(keyword)) score += 30;
-                if (seller.Contains(keyword)) score += 20;
-                if (description.Contains(keyword)) score += 10;
+                if (name == keyword)
+                {
+                    score += 100;
+                }
+
+                if (name.Contains(keyword))
+                {
+                    score += 60;
+                }
+
+                if (category.Contains(keyword))
+                {
+                    score += 30;
+                }
+
+                if (seller.Contains(keyword))
+                {
+                    score += 20;
+                }
+
+                if (description.Contains(keyword))
+                {
+                    score += 10;
+                }
             }
 
-            // Nếu người dùng nhập nguyên cụm gần giống tên sản phẩm thì cộng điểm cao hơn.
-            if (!string.IsNullOrWhiteSpace(name) && normalizedMessage.Contains(name)) score += 120;
+            if (!string.IsNullOrWhiteSpace(name) && normalizedMessage.Contains(name))
+            {
+                score += 120;
+            }
 
             return score;
         }
 
-        private static string BuildProductReply(List<Product> products, string originalMessage, string? intro = null)
+        private static string BuildProductReply(List<Product> products, string? intro = null)
         {
             var vi = CultureInfo.GetCultureInfo("vi-VN");
             var sb = new StringBuilder();
+
             sb.Append("🤖 Trợ lý KIMI: ");
             sb.Append(intro ?? $"Mình đã đọc database và tìm thấy {products.Count} sản phẩm phù hợp với câu hỏi của bạn:");
             sb.AppendLine();
@@ -219,40 +413,68 @@ namespace ĐồÁnCơSở.Hubs
             foreach (var p in products)
             {
                 var price = string.Format(vi, "{0:N0} VNĐ", p.Price);
-                var category = string.IsNullOrWhiteSpace(p.Category?.Name) ? "Chưa có danh mục" : p.Category.Name;
-                var seller = string.IsNullOrWhiteSpace(p.Seller?.Name) ? "Chưa rõ người bán" : p.Seller.Name;
-                var stockText = p.Stock > 0 ? $"Còn {p.Stock} sản phẩm" : "Có thể đang hết hàng";
+                var category = string.IsNullOrWhiteSpace(p.Category?.Name)
+                    ? "Chưa có danh mục"
+                    : p.Category.Name;
+
+                var seller = string.IsNullOrWhiteSpace(p.Seller?.Name)
+                    ? "Chưa rõ người bán"
+                    : p.Seller.Name;
+
+                var stockText = p.Stock > 0
+                    ? $"Còn {p.Stock} sản phẩm"
+                    : "Có thể đang hết hàng";
+
                 var shortDescription = Shorten(p.Description, 120);
 
                 sb.AppendLine($"- {p.Name} | Giá: {price} | Danh mục: {category} | {stockText} | Người bán: {seller}");
+
                 if (!string.IsNullOrWhiteSpace(shortDescription))
                 {
                     sb.AppendLine($"  Mô tả: {shortDescription}");
                 }
+
                 sb.AppendLine($"  Xem chi tiết: /Buyer/Home/Details?productId={p.Id}");
             }
 
             sb.Append("Bạn có thể bấm vào link chi tiết hoặc nhập tên sản phẩm vào ô tìm kiếm trên trang chủ để xem nhanh hơn nhé.");
+
             return sb.ToString();
         }
 
         private static string Shorten(string? value, int maxLength)
         {
-            if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
             value = Regex.Replace(value.Trim(), "\\s+", " ");
-            return value.Length <= maxLength ? value : value.Substring(0, maxLength).Trim() + "...";
+
+            return value.Length <= maxLength
+                ? value
+                : value.Substring(0, maxLength).Trim() + "...";
         }
 
         private static string NormalizeText(string value)
         {
-            if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
 
             value = value.ToLowerInvariant().Normalize(NormalizationForm.FormD);
-            var chars = value.Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark).ToArray();
+
+            var chars = value
+                .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                .ToArray();
+
             value = new string(chars).Normalize(NormalizationForm.FormC);
             value = value.Replace('đ', 'd').Replace('Đ', 'd');
+
             value = Regex.Replace(value, "[^a-z0-9\\s]", " ");
             value = Regex.Replace(value, "\\s+", " ").Trim();
+
             return value;
         }
     }
