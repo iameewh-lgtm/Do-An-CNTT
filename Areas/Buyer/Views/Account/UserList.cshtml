@@ -1,0 +1,53 @@
+﻿@model IEnumerable<ĐồÁnCơSở.Models.UserVM>
+
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+}
+
+<div class="container bg-white p-4 shadow-sm mt-4 rounded">
+    <div class="row align-items-center">
+        <div class="col-6">
+            <h2 class="text-taobao fw-bold mb-0">QUẢN LÝ NGƯỜI DÙNG</h2>
+        </div>
+    </div>
+    <hr class="my-4">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Email</th>
+                <th>Tên người dùng</th>
+                <th class="text-center">Quyền hạn (Role)</th>
+                <th class="text-center">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.Email</td>
+                        <td>@user.Name</td>
+                        <td class="text-center">
+                            @if (user.Role == "Admin")
+                            {
+                                <span class="badge rounded-pill bg-danger px-3">QUẢN TRỊ VIÊN</span>
+                            }
+                            else if (user.Role == "Seller")
+                            {
+                                <span class="badge rounded-pill bg-warning text-dark px-3">NGƯỜI BÁN</span>
+                            }
+                            else
+                            {
+                                <span class="badge rounded-pill bg-info text-dark px-3">NGƯỜI MUA</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <a asp-action="AssignRole" asp-route-userId="@user.Id" class="btn btn-outline-primary">Phân quyền</a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

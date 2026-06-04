@@ -1,0 +1,64 @@
+﻿@model IEnumerable<ĐồÁnCơSở.Models.Slider>
+
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark">Quản lý Banner (Slider)</h2>
+        <a asp-action="Upsert" class="btn text-white fw-bold shadow-sm" style="background-color: #ff5000; border-radius: 50px; padding: 10px 25px;">
+            <i class="bi bi-plus-circle me-1"></i> Thêm Banner
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" class="rounded-start">Hình ảnh Banner</th>
+                            <th scope="col">Tiêu đề</th>
+                            <th scope="col">Trạng thái</th>
+                            <th scope="col" class="rounded-end text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <img src="@item.ImageUrl" style="height: 80px; width: 160px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;" onerror="this.src='/images/no-image.png'" />
+                                    </td>
+                                    <td class="fw-bold text-dark">@item.Title</td>
+                                    <td>
+                                        <span class="badge bg-success px-3 py-2 rounded-pill">Đang hiển thị</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group shadow-sm">
+                                            <a asp-action="Upsert" asp-route-id="@item.Id" class="btn btn-sm btn-outline-dark fw-bold px-3">
+                                                <i class="bi bi-pencil-square"></i> Sửa
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger fw-bold px-3">
+                                                <i class="bi bi-trash"></i> Xóa
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-5">
+                                    <i class="bi bi-images text-secondary mb-3" style="font-size: 3rem;"></i>
+                                    <h5 class="fw-bold">Chưa có Banner nào!</h5>
+                                    <p>Trâm hãy nhấn "Thêm Banner" để trang chủ có ảnh chạy slide nhé.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

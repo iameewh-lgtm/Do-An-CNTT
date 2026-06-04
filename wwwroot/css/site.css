@@ -1,0 +1,87 @@
+:root {
+    --taobao-orange: #ff4400;
+    --taobao-bg: #f4f4f4;
+}
+
+body {
+    background-color: var(--taobao-bg);
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Thanh tìm kiếm rực rỡ */
+.search-container {
+    border: 2px solid var(--taobao-orange);
+    border-radius: 25px;
+    background: white;
+}
+
+.search-input {
+    border: none;
+    outline: none;
+    padding: 10px 20px;
+}
+
+.search-btn {
+    background: var(--taobao-orange);
+    color: white;
+    border: none;
+    padding: 10px 40px;
+    border-radius: 0 23px 23px 0;
+    font-weight: bold;
+}
+
+/* Thẻ sản phẩm chuẩn sàn */
+.product-card {
+    border: none;
+    border-radius: 12px;
+    transition: 0.3s;
+    background: white;
+    overflow: hidden;
+}
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+.product-img {
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+.product-price {
+    color: var(--taobao-orange);
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.product-name {
+    font-size: 0.95rem;
+    color: #333;
+    height: 40px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+/* Menu danh mục xịn */
+.cat-sidebar {
+    border-radius: 10px;
+    overflow: hidden;
+    border: none;
+}
+
+.cat-item {
+    border: none;
+    padding: 12px 20px;
+    transition: 0.2s;
+}
+
+    .cat-item:hover {
+        background-color: #fff1eb;
+        color: var(--taobao-orange);
+    }
+
+    .cat-item.active {
+        background-color: var(--taobao-orange) !important;
+        color: white !important;
+    }

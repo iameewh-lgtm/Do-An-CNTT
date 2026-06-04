@@ -1,0 +1,76 @@
+HƯỚNG DẪN CẤU HÌNH AI CHATBOT + GOOGLE LOGIN CHO KIMI MARKET
+
+I. CÁC CHỨC NĂNG ĐÃ THÊM
+1. Trợ lý AI KIMI trong trang Tin nhắn
+- Người dùng có thể tự gõ câu hỏi thủ công.
+- Có các nút câu hỏi nhanh: Cách đặt hàng, Thanh toán VNPAY, Liên hệ Admin, Xem đơn hàng, Tìm sản phẩm, Thông tin tài khoản.
+- Nếu có API key thì hệ thống gọi AI thật.
+- Nếu chưa có API key hoặc API lỗi thì bot vẫn trả lời bằng kịch bản dự phòng để web không bị sập.
+
+2. AI tạo mô tả sản phẩm cho Seller
+- Vào Seller > Quản lý sản phẩm > Thêm/Sửa sản phẩm.
+- Nhập tên sản phẩm, giá, danh mục.
+- Bấm nút "Tạo mô tả bằng AI".
+- AI sẽ điền mô tả vào ô Mô tả. Người bán có thể chỉnh lại trước khi lưu.
+
+3. Đăng nhập bằng Google
+- Trang đăng nhập có thêm nút "Đăng nhập bằng Google".
+- Tài khoản Google đăng nhập lần đầu sẽ tự tạo user mới với vai trò Buyer.
+
+II. CẤU HÌNH AI BẰNG USER SECRETS
+Không dán API key trực tiếp vào code hoặc GitHub.
+
+A. Nếu dùng Gemini:
+dotnet user-secrets set "Gemini:ApiKey" "KEY_GEMINI_MOI_CUA_BAN"
+dotnet user-secrets set "Gemini:Model" "gemini-1.5-flash"
+
+B. Nếu dùng GPT/OpenAI:
+dotnet user-secrets set "OpenAI:ApiKey" "sk-KEY_OPENAI_CUA_BAN"
+dotnet user-secrets set "OpenAI:Model" "gpt-4o-mini"
+
+C. Chọn provider thủ công nếu muốn:
+dotnet user-secrets set "AI:Provider" "Gemini"
+hoặc
+dotnet user-secrets set "AI:Provider" "OpenAI"
+
+Nếu không set AI:Provider hoặc để Auto, hệ thống sẽ ưu tiên OpenAI nếu có OpenAI key, nếu không thì dùng Gemini nếu có Gemini key.
+
+III. CẤU HÌNH GOOGLE LOGIN
+1. Vào Google Cloud Console.
+2. Tạo OAuth Client ID loại Web application.
+3. Thêm Authorized redirect URI theo cổng localhost của project, ví dụ:
+https://localhost:7167/signin-google
+
+Nếu project chạy cổng khác, thay 7167 bằng cổng đang chạy trong file Properties/launchSettings.json.
+
+4. Lưu ClientId và ClientSecret bằng User Secrets:
+dotnet user-secrets set "Authentication:Google:ClientId" "CLIENT_ID_CUA_BAN"
+dotnet user-secrets set "Authentication:Google:ClientSecret" "CLIENT_SECRET_CUA_BAN"
+
+IV. CÁC FILE ĐÃ SỬA/THÊM
+- Program.cs
+- Hubs/ChatHub.cs
+- Services/IAIChatService.cs
+- Services/AIChatService.cs
+- Models/ProductDescriptionRequest.cs
+- Areas/Buyer/Controllers/AccountController.cs
+- Areas/Buyer/Controllers/ChatController.cs
+- Areas/Buyer/Views/Account/Login.cshtml
+- Areas/Buyer/Views/Chat/Index.cshtml
+- Areas/Seller/Controllers/ProductController.cs
+- Areas/Seller/Views/Product/Upsert.cshtml
+- Utility/DbInitializer.cs
+- appsettings.json
+- appsettings.Development.json
+
+V. LƯU Ý KHI MỞ PROJECT
+Bản này đã đóng gói lại với tên thư mục và project dễ mở hơn.
+Nên mở file KIMI_MARKET.csproj hoặc KIMI_MARKET.sln trong Visual Studio.
+Nếu Visual Studio báo restore package, bấm Restore để tải Microsoft.AspNetCore.Authentication.Google.
+
+VI. BẢN SỬA THÊM: CHATBOT ĐỌC DATABASE SẢN PHẨM
+- Chatbot trong tab "Trợ lý AI KIMI" đã được sửa để đọc bảng Products trước khi gọi GPT/Gemini.
+- Khi người dùng hỏi tên sản phẩm, ví dụ "Tôi muốn tìm Mambo" hoặc "Giá Mambo bao nhiêu?", bot sẽ tra database hiện tại.
+- Bot trả về tên sản phẩm, giá, danh mục, tồn kho, người bán, mô tả ngắn và link chi tiết sản phẩm.
+- Nếu không tìm thấy trong database, bot sẽ báo không tìm thấy thay vì trả lời chung chung.
+- Lưu ý: bot đọc đúng database trong ConnectionStrings:DefaultConnection. Nếu sản phẩm nằm trong SQL Express thì connection string phải trỏ tới localhost\\SQLEXPRESS.

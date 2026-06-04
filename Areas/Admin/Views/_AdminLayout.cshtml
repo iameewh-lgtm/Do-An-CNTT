@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - KIMI Admin</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .wrapper {
+            display: flex;
+            flex: 1;
+        }
+
+        #sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background: #343a40;
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+            #sidebar .sidebar-header {
+                padding: 20px;
+                background: #212529;
+            }
+
+            #sidebar ul p {
+                color: #fff;
+                padding: 10px;
+            }
+
+            #sidebar ul li a {
+                padding: 10px 20px;
+                font-size: 1.1em;
+                display: block;
+                color: #ced4da;
+                text-decoration: none;
+            }
+
+                #sidebar ul li a:hover {
+                    color: #fff;
+                    background: #495057;
+                }
+
+        #content {
+            width: 100%;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark border-bottom box-shadow">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="Buyer" asp-controller="Home" asp-action="Index">KIMI MARKET (Trang chủ)</a>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-collapse collapse d-sm-inline-flex justify-content-between"></ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="wrapper">
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>KIMI ADMIN</h3>
+            </div>
+            <ul class="list-unstyled components">
+                <li><a asp-area="Admin" asp-controller="Admin" asp-action="Dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a asp-area="Admin" asp-controller="Category" asp-action="Index"><i class="bi bi-tag"></i> Quản lý Danh mục</a></li>
+                <li><a asp-area="Admin" asp-controller="Slider" asp-action="Index"><i class="bi bi-images"></i> Quản lý Slider</a></li>
+                <li><a asp-area="Admin" asp-controller="User" asp-action="Index"><i class="bi bi-people"></i> Quản lý Người dùng</a></li>
+                <hr />
+                <li><a asp-area="Seller" asp-controller="Product" asp-action="Index"><i class="bi bi-box-seam"></i> Xem Sản phẩm</a></li>
+            </ul>
+        </nav>
+
+        <div id="content">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <footer class="border-top footer text-muted bg-light text-center py-3">
+        <div class="container">
+            &copy; 2026 - KIMI MARKET - Khu vực Quản trị
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

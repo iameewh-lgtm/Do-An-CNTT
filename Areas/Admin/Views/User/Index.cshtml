@@ -1,0 +1,118 @@
+﻿@model IEnumerable<ĐồÁnCơSở.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Quản lý Người dùng";
+    var userRoles = ViewBag.UserRoles as Dictionary<string, string>;
+}
+
+<div class="container p-4 mt-4 bg-white shadow-sm rounded-4 mb-5">
+    <div class="row mb-4 border-bottom pb-3">
+        <div class="col-6 d-flex align-items-center">
+            <h3 class="fw-bold mb-0 text-dark" style="font-family: 'Playfair Display', serif; letter-spacing: 1px;">
+                <i class="bi bi-people me-2"></i> QUẢN LÝ NGƯỜI DÙNG
+            </h3>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover align-middle border" style="width:100%">
+            <thead class="table-light text-secondary">
+                <tr>
+                    <th class="py-3 px-4">HỌ VÀ TÊN</th>
+                    <th class="py-3">CHỨC VỤ</th>
+                    <th class="py-3">EMAIL / TÀI KHOẢN</th>
+                    <th class="py-3">SỐ ĐIỆN THOẠI</th>
+                    <th class="py-3 text-center">TRẠNG THÁI</th>
+                    <th class="py-3 text-center">THAO TÁC</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    // Xác định màu của Tag Role
+                    string role = userRoles != null && userRoles.ContainsKey(item.Id) ? userRoles[item.Id] : "Khách hàng";
+                    string roleBadgeClass = role == "Admin" ? "bg-danger" : (role == "Seller" ? "bg-warning text-dark" : "bg-secondary");
+
+                    <tr>
+                        <td class="fw-bold px-4">@(item.Name ?? "Chưa có tên")</td>
+                        <td>
+                            <span class="badge rounded-pill @roleBadgeClass px-3 py-1">@role</span>
+                        </td>
+                        <td class="text-primary">@item.Email</td>
+                        <td>@(item.PhoneNumber ?? "Chưa cập nhật")</td>
+                        <td class="text-center">
+                            @if (item.LockoutEnd != null && item.LockoutEnd > DateTime.Now)
+                            {
+                                <span class="badge rounded-pill border px-3 py-1 bg-danger text-white">Đã bị khóa</span>
+                            }
+                            else
+                            {
+                                <span class="badge rounded-pill border px-3 py-1 bg-success text-white">Đang hoạt động</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <button onclick="UpdateName('@item.Id', '@(item.Name ?? "")')" class="btn btn-info btn-sm rounded-pill px-3 shadow-sm me-1 text-white">
+                                <i class="bi bi-pencil-square me-1"></i> Đổi tên
+                            </button>
+
+                            @if (item.LockoutEnd != null && item.LockoutEnd > DateTime.Now)
+                            {
+                                <button onclick="LockUnlock('@item.Id')" class="btn btn-success btn-sm rounded-pill px-3 shadow-sm">
+                                    <i class="bi bi-unlock me-1"></i> Mở khóa
+                                </button>
+                            }
+                            else
+                            {
+                                <button onclick="LockUnlock('@item.Id')" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm">
+                                    <i class="bi bi-lock me-1"></i> Khóa
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Xử lý Khóa / Mở khóa
+        function LockUnlock(id) {
+            $.ajax({
+                type: "POST",
+                url: '/Admin/User/LockUnlock',
+                data: JSON.stringify(id),
+                contentType: "application/json",
+                success: function (data) {
+                    if (data.success) {
+                        toastr.success(data.message);
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        toastr.error(data.message);
+                    }
+                }
+            });
+        }
+
+        // Xử lý Đổi Tên
+        function UpdateName(id, currentName) {
+            let newName = prompt("Nhập tên mới cho người dùng này:", currentName);
+            if (newName != null && newName.trim() !== "") {
+                $.ajax({
+                    type: "POST",
+                    url: '/Admin/User/UpdateName',
+                    data: { id: id, newName: newName },
+                    success: function (data) {
+                        if (data.success) {
+                            toastr.success(data.message);
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            toastr.error(data.message);
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

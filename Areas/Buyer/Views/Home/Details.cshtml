@@ -1,0 +1,83 @@
+﻿@model ĐồÁnCơSở.Models.ShoppingCart
+
+@{
+    ViewData["Title"] = Model.Product.Name;
+}
+
+<div class="container mt-4 mb-5">
+    <div class="mb-3">
+        <a asp-action="Index" class="text-decoration-none fw-semibold" style="color: #ff5000;">Trang chủ</a> 
+        <span class="text-muted">/ @Model.Product.Name</span>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="row g-0">
+            <div class="col-md-5 p-4 text-center d-flex align-items-center justify-content-center bg-light">
+                <img src="@Model.Product.ImageUrl" class="img-fluid rounded-3 shadow" style="max-height: 450px; object-fit: contain;" onerror="this.src='/images/no-image.png'" />
+            </div>
+            
+            <div class="col-md-7 p-5 bg-white">
+                <span class="badge mb-3 text-dark px-3 py-2" style="background-color: #ffc107; font-size: 12px; letter-spacing: 1px;">@Model.Product.Category.Name</span>
+                
+                <h2 class="fw-bold text-dark mb-2" style="font-family: 'Playfair Display', serif;">@Model.Product.Name</h2>
+                <h2 class="fw-bold mb-4" style="color: #ff5000;">@Model.Product.Price.ToString("N0") VNĐ</h2>
+                
+                <p class="text-muted mb-4" style="line-height: 1.7; font-size: 15px;">@Model.Product.Description</p>
+
+                <div class="d-flex align-items-center justify-content-between p-3 mb-4 rounded-3" style="background-color: #f8f9fa; border: 1px solid #eaeaea;">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 50px; height: 50px;">
+                            <i class="bi bi-shop fs-5"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block fw-semibold mb-1" style="font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase;">Cung cấp bởi</small>
+                            <a href="/Buyer/Home/ShopInfo?sellerId=@Model.Product.SellerId" class="text-dark fw-bold text-decoration-none fs-6 transition-hover-text">
+                                @(Model.Product.Seller?.Name ?? Model.Product.Seller?.UserName ?? "KIMI Shop") <i class="bi bi-check-circle-fill text-success ms-1" style="font-size: 13px;"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="text-end border-start ps-4 me-2">
+                        <small class="text-muted d-block fw-semibold mb-1" style="font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase;">Đã bán</small>
+                        <span class="fw-bold fs-4 text-dark">@Model.Product.SoldQuantity</span>
+                    </div>
+                </div>
+
+                <form method="post">
+                    <input hidden asp-for="ProductId" />
+                    
+                    <div class="d-flex align-items-center mb-4 bg-light p-2 rounded-pill d-inline-flex border">
+                        <span class="ms-3 me-3 text-dark fw-semibold">Số lượng</span>
+                        <input asp-for="Count" type="number" value="1" class="form-control text-center shadow-none border-dark rounded-pill fw-bold" style="width: 80px;" min="1" max="@Model.Product.Stock" />
+                        <span class="ms-3 me-3 text-muted small">(Kho: @Model.Product.Stock)</span>
+                    </div>
+
+                    <div class="row g-3 mt-2">
+                        <div class="col-sm-6">
+                            <button type="submit" class="btn w-100 fw-bold py-3 text-white transition-hover shadow-sm" style="background-color: #ff5000; border-radius: 12px; font-size: 15px;">
+                                <i class="bi bi-cart-plus me-2 fs-5 align-middle"></i> THÊM VÀO GIỎ HÀNG
+                            </button>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <a href="/Buyer/Chat/Index?userId=@Model.Product.SellerId" class="btn btn-dark w-100 fw-bold py-3 transition-hover shadow-sm" style="border-radius: 12px; font-size: 15px;">
+                                <i class="bi bi-chat-dots me-1 fs-5 align-middle"></i> CHAT
+                            </a>
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            <a asp-action="Index" class="btn btn-outline-secondary w-100 fw-bold py-3 transition-hover" style="border-radius: 12px; font-size: 15px;">
+                                QUAY LẠI
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover { transition: all 0.3s ease; }
+    .transition-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; filter: brightness(1.05); }
+    .transition-hover-text:hover { color: #ff5000 !important; }
+</style>    

@@ -1,0 +1,27 @@
+﻿@model ĐồÁnCơSở.Models.Category
+
+<div class="container bg-white p-5 shadow-sm mt-4 rounded" style="max-width: 600px;">
+    <h2 class="text-taobao fw-bold mb-4 text-center">THÊM DANH MỤC</h2>
+    <form asp-action="Create" method="post">
+        <div class="mb-4">
+            <label class="form-label fw-bold">Tên danh mục</label>
+            <input asp-for="Name" class="form-control border-2" placeholder="Ví dụ: Điện thoại, Thời trang..." />
+            <span asp-validation-for="Name" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-bold">Đường dẫn ảnh (URL)</label>
+            <input asp-for="ImageUrl" class="form-control border-2" placeholder="Ví dụ: /images/hinh.png hoặc dán link online..." />
+            <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-6">
+                <button type="submit" class="btn bg-taobao w-100 py-2 fw-bold shadow-sm text-white">LƯU LẠI</button>
+            </div>
+            <div class="col-6">
+                <a asp-action="Index" class="btn btn-outline-secondary w-100 py-2 fw-bold shadow-sm">QUAY LẠI</a>
+            </div>
+        </div>
+    </form>
+</div>

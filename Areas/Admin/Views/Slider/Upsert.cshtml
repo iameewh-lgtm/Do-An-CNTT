@@ -1,0 +1,41 @@
+﻿@model ĐồÁnCơSở.Models.Slider
+
+<div class="container mt-4">
+    <form method="post" enctype="multipart/form-data">
+        <input name="Id" value="@Model.Id" hidden />
+        <input name="ImageUrl" value="@Model.ImageUrl" hidden />
+        
+        <div class="card shadow border-0">
+            <div class="card-header bg-dark text-white text-center py-3">
+                <h2 class="mb-0 fw-bold">@(Model.Id != 0 ? "CẬP NHẬT BANNER" : "THÊM BANNER MỚI")</h2>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tiêu đề banner</label>
+                    <input name="Title" value="@Model.Title" class="form-control" placeholder="Nhập tiêu đề..." required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Hình ảnh Banner</label>
+                    <input type="file" name="file" class="form-control" />
+                </div>
+                
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="mb-4 text-center border p-2 rounded">
+                        <img src="@Model.ImageUrl" style="max-width:100%; height:250px; object-fit:cover;" class="rounded shadow-sm" />
+                    </div>
+                }
+
+                <div class="row">
+                    <div class="col-6">
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">LƯU LẠI</button>
+                    </div>
+                    <div class="col-6">
+                        <a asp-action="Index" class="btn btn-outline-secondary w-100">QUAY LẠI</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

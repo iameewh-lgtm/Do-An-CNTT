@@ -1,0 +1,143 @@
+﻿@model ĐồÁnCơSở.Models.Product
+<div class="container mt-4 mb-5">
+    <div class="card shadow border-0 rounded-4">
+        <div class="card-header bg-dark text-white py-3">
+            <h4 class="mb-0 fw-bold">@(Model != null && Model.Id != 0 ? "Cập nhật sản phẩm" : "Thêm sản phẩm mới")</h4>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" enctype="multipart/form-data">
+                @if (Model != null)
+                {
+                    <input asp-for="Id" hidden />
+                    <input asp-for="ImageUrl" hidden />
+                    <input asp-for="SellerId" hidden />
+                }
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tên sản phẩm</label>
+                    <input asp-for="Name" class="form-control rounded-pill px-3 shadow-sm" placeholder="Nhập tên sản phẩm..." />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label fw-bold mb-0">Mô tả</label>
+                        <button type="button" id="generateDescriptionBtn" class="btn btn-sm btn-outline-primary rounded-pill fw-bold">
+                            <i class="bi bi-magic"></i> Tạo mô tả bằng AI
+                        </button>
+                    </div>
+                    <textarea asp-for="Description" class="form-control rounded-3 p-3 shadow-sm" rows="4" placeholder="Mô tả chi tiết..."></textarea>
+                    <div id="aiDescriptionStatus" class="small text-muted mt-2"></div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Giá bán</label>
+                        <input asp-for="Price" class="form-control rounded-pill px-3 shadow-sm" type="number" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Số lượng tồn</label>
+                        <input asp-for="Stock" class="form-control rounded-pill px-3 shadow-sm" type="number" />
+                        <span asp-validation-for="Stock" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Danh mục</label>
+                    @{
+                        var categoryList = ViewBag.CategoryList as IEnumerable<SelectListItem>;
+                    }
+                    @if (categoryList != null)
+                    {
+                        <select asp-for="CategoryId" asp-items="categoryList" class="form-select rounded-pill px-3 shadow-sm">
+                            <option disabled selected>-- Chọn danh mục --</option>
+                        </select>
+                    }
+                    else
+                    {
+                        <select class="form-select rounded-pill px-3 shadow-sm" disabled>
+                            <option>Hệ thống đang gặp lỗi tải danh mục</option>
+                        </select>
+                    }
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Hình ảnh sản phẩm</label>
+                    <input type="file" name="file" class="form-control rounded-pill px-3 mb-3 shadow-sm" />
+                    
+                    @if (Model != null && !string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <div class="mt-2 text-center">
+                            <p class="text-muted small mb-2">Ảnh hiện tại:</p>
+                            <img src="@Model.ImageUrl" width="200" class="border rounded-3 shadow-sm" />
+                        </div>
+                    }
+                </div>
+
+                <div class="d-flex gap-3 mt-5">
+                    <button type="submit" class="btn text-white fw-bold rounded-pill px-5 py-2 shadow-sm" style="background-color: #ff5000;">
+                        LƯU SẢN PHẨM
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-dark rounded-pill px-5 fw-bold py-2 shadow-sm">
+                        QUAY LẠI
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById("generateDescriptionBtn")?.addEventListener("click", async function () {
+            const button = this;
+            const status = document.getElementById("aiDescriptionStatus");
+            const productName = document.getElementById("Name")?.value || "";
+            const priceText = document.getElementById("Price")?.value || "";
+            const categorySelect = document.getElementById("CategoryId");
+            const categoryName = categorySelect && categorySelect.selectedIndex >= 0
+                ? categorySelect.options[categorySelect.selectedIndex].text
+                : "";
+
+            if (productName.trim() === "") {
+                status.className = "small text-danger mt-2";
+                status.innerText = "Vui lòng nhập tên sản phẩm trước khi tạo mô tả.";
+                return;
+            }
+
+            button.disabled = true;
+            status.className = "small text-muted mt-2";
+            status.innerText = "AI đang tạo mô tả sản phẩm...";
+
+            try {
+                const response = await fetch("/Seller/Product/GenerateDescription", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        productName: productName,
+                        categoryName: categoryName,
+                        price: priceText ? Number(priceText) : null
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById("Description").value = data.description;
+                    status.className = "small text-success mt-2";
+                    status.innerText = "Đã tạo mô tả bằng AI. Bạn có thể chỉnh lại trước khi lưu.";
+                } else {
+                    status.className = "small text-danger mt-2";
+                    status.innerText = data.message || "Không tạo được mô tả.";
+                }
+            } catch (error) {
+                status.className = "small text-danger mt-2";
+                status.innerText = "Lỗi khi gọi AI. Vui lòng thử lại.";
+            } finally {
+                button.disabled = false;
+            }
+        });
+    </script>
+}

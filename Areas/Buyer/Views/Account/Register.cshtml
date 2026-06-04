@@ -1,0 +1,117 @@
+﻿@model ĐồÁnCơSở.Models.RegisterVM
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng ký tài khoản - KIMI MARKET</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+
+        .card-register {
+            border-radius: 15px;
+            border: none;
+            max-width: 500px;
+            margin-top: 50px;
+        }
+
+        .btn-register {
+            background-color: #ff5000;
+            color: white;
+            border: none;
+        }
+
+            .btn-register:hover {
+                background-color: #e64500;
+                color: white;
+            }
+
+        .text-kimi {
+            color: #ff5000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow card-register mx-auto">
+                    <div class="card-body p-5">
+                        <h2 class="text-center mb-4 fw-bold text-kimi">TẠO TÀI KHOẢN</h2>
+                        <form asp-action="Register" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Name" class="form-control" placeholder="Họ và tên" />
+                                <label asp-for="Name">Họ và tên của bạn</label>
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Email" class="form-control" placeholder="Email" />
+                                <label asp-for="Email">Địa chỉ Email</label>
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Password" type="password" class="form-control" placeholder="Mật khẩu" />
+                                <label asp-for="Password">Mật khẩu</label>
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Xác nhận mật khẩu" />
+                                <label asp-for="ConfirmPassword">Xác nhận mật khẩu</label>
+                                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                            </div>
+
+                            @* ĐÃ FIX CHỖ CHỌN ROLE Ở ĐÂY *@
+                            <div class="form-floating mb-4">
+                                <select asp-for="Role" asp-items="@ViewBag.RoleList" class="form-select">
+                                    <option disabled selected>-- Chọn vai trò --</option>
+                                </select>
+                                <label asp-for="Role">Bạn đăng ký với vai trò là?</label>
+                                <span asp-validation-for="Role" class="text-danger small"></span>
+                            </div>
+
+                            <button type="submit" class="btn btn-register w-100 py-2 fw-bold shadow-sm mb-3">Đăng ký ngay</button>
+                        </form>
+
+                        @if (ViewBag.GoogleLoginEnabled == true)
+                        {
+                        <div class="d-flex align-items-center my-3">
+                            <hr class="flex-grow-1" />
+                            <span class="px-2 text-muted small">hoặc</span>
+                            <hr class="flex-grow-1" />
+                        </div>
+
+                        <form asp-action="ExternalLogin" method="post" class="mb-3">
+                            <input type="hidden" name="provider" value="Google" />
+                            <button type="submit" class="btn btn-outline-danger w-100 py-2 shadow-sm fw-bold">
+                                <i class="bi bi-google me-2"></i> Đăng ký / Đăng nhập bằng Google
+                            </button>
+                        </form>
+                        }
+
+                        <div class="text-center mt-2">
+                            <span class="text-muted small">Đã có tài khoản?</span>
+                            <a asp-action="Login" class="text-decoration-none small fw-bold text-kimi">Đăng nhập</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

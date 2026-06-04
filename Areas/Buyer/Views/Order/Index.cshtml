@@ -1,0 +1,79 @@
+﻿@model IEnumerable<ĐồÁnCơSở.Models.OrderHeader>
+
+@{
+    string roleContext = ViewBag.RoleContext ?? "Buyer";
+    string boxTitle = roleContext == "Buyer" ? "Tổng chi tiêu của bạn" : (roleContext == "Admin" ? "Doanh thu phí sàn (5%)" : "Doanh thu Shop (95%)");
+}
+
+<div class="container p-4 mt-4 bg-white shadow-sm rounded-4">
+    <div class="row mb-4 border-bottom pb-3">
+        <div class="col-md-6 d-flex align-items-center">
+            <h3 class="fw-bold mb-0 text-dark" style="font-family: 'Playfair Display', serif; letter-spacing: 1px;">QUẢN LÝ ĐƠN HÀNG</h3>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <div class="d-inline-block p-3 rounded-4" style="background: linear-gradient(135deg, #111 0%, #333 100%); color: white; box-shadow: 0 10px 20px rgba(0,0,0,0.15);">
+                <span class="small text-uppercase opacity-75" style="letter-spacing: 1px;">@boxTitle</span><br/>
+                <h3 class="mb-0 fw-bold mt-1" style="font-family: 'Plus Jakarta Sans', sans-serif;">@ViewBag.TotalMoney.ToString("N0") <span class="fs-6">VNĐ</span></h3>
+            </div>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover align-middle border" style="width:100%">
+            <thead class="table-light text-secondary">
+                <tr>
+                    <th class="py-3 px-4">MÃ ĐƠN</th>
+                    @if (roleContext != "Buyer") { <th class="py-3">KHÁCH HÀNG</th> }
+                    <th class="py-3">SỐ ĐIỆN THOẠI</th>
+                    <th class="py-3">NGÀY ĐẶT</th>
+                    <th class="py-3 text-end">@((roleContext == "Seller") ? "TỔNG SHOP" : "TỔNG ĐƠN")</th>
+                    <th class="py-3 text-center">TRẠNG THÁI</th>
+                    <th class="py-3 text-center">THAO TÁC</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold px-4">#@item.Id</td>
+                        @if (roleContext != "Buyer") { <td class="fw-medium">@item.Name</td> }
+                        <td>@item.PhoneNumber</td>
+                        <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="text-end fw-bold text-danger">@item.OrderTotal.ToString("N0") ₫</td>
+                        <td class="text-center">
+                            @if (item.OrderStatus == "Đã hoàn thành")
+                            {
+                                <span class="badge bg-success rounded-pill px-3 py-2">@item.OrderStatus</span>
+                            }
+                            else
+                            {
+                                <span class="badge rounded-pill border px-3 py-2 text-dark" style="background-color: #f8f9fa;">@item.OrderStatus</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <a asp-action="Details" asp-route-orderId="@item.Id" class="btn btn-dark btn-sm rounded-pill px-3 shadow-sm transition-hover mb-1">
+                                Xem chi tiết
+                            </a>
+                            
+                            @* HIỆN NÚT NHẬN HÀNG NẾU LÀ BUYER VÀ CHƯA HOÀN THÀNH *@
+                            @if (roleContext == "Buyer" && item.OrderStatus != "Đã hoàn thành" && item.OrderStatus != "Đã hủy")
+                            {
+                                <form asp-action="ConfirmReceipt" method="post" class="d-inline">
+                                    <input type="hidden" name="orderId" value="@item.Id" />
+                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 shadow-sm transition-hover mb-1" onclick="return confirm('Bạn xác nhận đã nhận được hàng?');">
+                                        <i class="bi bi-check-circle"></i> Nhận hàng
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .transition-hover { transition: all 0.3s ease; }
+    .transition-hover:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+</style>

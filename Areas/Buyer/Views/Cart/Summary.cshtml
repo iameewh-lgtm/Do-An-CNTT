@@ -1,0 +1,179 @@
+﻿@model ĐồÁnCơSở.Models.ShoppingCartVM
+@{
+    ViewData["Title"] = "Xác nhận đơn hàng";
+}
+
+<div class="container mt-4 mb-5">
+    <form method="post" id="checkoutForm">
+        <div class="row">
+            <div class="col-12 col-lg-7 mb-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-dark text-white py-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-geo-alt"></i> Thông tin giao hàng</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Họ và tên người nhận</label>
+                            <input asp-for="CustomerName" class="form-control border-2" required placeholder="Nhập họ và tên..." />
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Số điện thoại</label>
+                            <input asp-for="CustomerPhoneNumber" class="form-control border-2" required placeholder="Nhập số điện thoại liên hệ..." />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Tỉnh / Thành phố</label>
+                                <select asp-for="City" class="form-select border-2" id="city" required>
+                                    <option value="" selected disabled>Chọn Tỉnh/Thành</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Quận / Huyện</label>
+                                <select asp-for="District" class="form-select border-2" id="district" required>
+                                    <option value="" selected disabled>Chọn Quận/Huyện</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Phường / Xã</label>
+                                <select asp-for="Ward" class="form-select border-2" id="ward" required>
+                                    <option value="" selected disabled>Chọn Phường/Xã</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Số nhà, tên đường chi tiết</label>
+                            <input asp-for="StreetAddress" id="street" class="form-control border-2" required placeholder="Ví dụ: 123 Đường Nguyễn Văn Cừ..." />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mt-4">
+                    <div class="card-header bg-dark text-white py-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-wallet2"></i> Phương thức thanh toán</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="form-check mb-3 p-3 border rounded">
+                            <input class="form-check-input ms-1" type="radio" name="PaymentMethod" id="cod" value="COD" checked>
+                            <label class="form-check-label fw-bold ms-3" for="cod">
+                                <img src="https://cdn-icons-png.flaticon.com/512/2800/2800155.png" width="30" class="me-2" /> Thanh toán khi nhận hàng (COD)
+                            </label>
+                        </div>
+                        <div class="form-check mb-3 p-3 border rounded">
+                            <input class="form-check-input ms-1" type="radio" name="PaymentMethod" id="momo" value="MOMO">
+                            <label class="form-check-label fw-bold ms-3" for="momo">
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" width="30" class="me-2" /> Thanh toán qua Ví MoMo
+                            </label>
+                        </div>
+                        <div class="form-check mb-3 p-3 border rounded">
+                            <input class="form-check-input ms-1" type="radio" name="PaymentMethod" id="zalopay" value="ZALOPAY">
+                            <label class="form-check-label fw-bold ms-3" for="zalopay">
+                                <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-ZaloPay-Square.png" width="30" class="me-2" /> Thanh toán qua ZaloPay
+                            </label>
+                        </div>
+                        <div class="form-check mb-3 p-3 border rounded">
+                            <input class="form-check-input ms-1" type="radio" name="PaymentMethod" id="visa" value="VISA">
+                            <label class="form-check-label fw-bold ms-3" for="visa">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" width="40" class="me-2" /> Thẻ Tín dụng / Ghi nợ (Visa, Mastercard)
+                            </label>
+                        </div>
+                        <div class="form-check mb-3 p-3 border rounded">
+                            <input class="form-check-input ms-1" type="radio" name="PaymentMethod" id="vnpay" value="VNPAY">
+                            <label class="form-check-label fw-bold ms-3" for="vnpay">
+                                <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg" width="40" class="me-2" /> Thanh toán qua VNPAY
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-5">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-dark text-white py-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-card-checklist"></i> Tóm tắt đơn hàng</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            @if (Model != null && Model.ListCart != null)
+                            {
+                                foreach (var details in Model.ListCart)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                        <div class="d-flex align-items-center">
+                                            <img src="@details.Product.ImageUrl" style="width: 60px; height: 60px; object-fit: cover;" class="me-3 rounded border shadow-sm" onerror="this.src='/images/no-image.png'" />
+                                            <div>
+                                                <h6 class="my-0 fw-bold text-dark">@details.Product.Name</h6>
+                                                <small class="text-muted">Số lượng: @details.Count</small>
+                                            </div>
+                                        </div>
+                                        <span class="text-muted fw-bold">@((details.Product.Price * details.Count).ToString("N0")) ₫</span>
+                                    </li>
+                                }
+                            }
+                            <li class="list-group-item d-flex justify-content-between align-items-center p-3 bg-light border-top">
+                                <span class="fw-bold text-dark" style="font-size: 1.1rem;">Tổng thanh toán:</span>
+                                <span class="fw-bold" style="font-size: 1.3rem; color: #ff5000;">@Model?.OrderTotal.ToString("N0") VNĐ</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-white border-0 p-3">
+                        <button type="submit" class="btn w-100 py-3 fw-bold text-white text-uppercase shadow-sm" style="background-color: #ff5000; border: none;">
+                            <i class="bi bi-check-circle"></i> XÁC NHẬN ĐẶT HÀNG
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary w-100 py-3 mt-2 fw-bold text-uppercase shadow-sm">
+                            <i class="bi bi-arrow-left"></i> Quay lại giỏ hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script>
+        var citis = document.getElementById("city");
+        var districts = document.getElementById("district");
+        var wards = document.getElementById("ward");
+        var Parameter = {
+            url: "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json",
+            method: "GET",
+            responseType: "application/json",
+        };
+        var promise = axios(Parameter);
+        promise.then(function (result) {
+            renderCity(result.data);
+        });
+
+        function renderCity(data) {
+            for (const x of data) {
+                citis.options[citis.options.length] = new Option(x.Name, x.Name);
+            }
+            citis.onchange = function () {
+                district.length = 1;
+                ward.length = 1;
+                if(this.value != ""){
+                    const result = data.filter(n => n.Name === this.value);
+
+                    for (const k of result[0].Districts) {
+                        district.options[district.options.length] = new Option(k.Name, k.Name);
+                    }
+                }
+            };
+            district.onchange = function () {
+                ward.length = 1;
+                const dataCity = data.filter((n) => n.Name === citis.value);
+                if (this.value != "") {
+                    const dataWards = dataCity[0].Districts.filter(n => n.Name === this.value)[0].Wards;
+
+                    for (const w of dataWards) {
+                        wards.options[wards.options.length] = new Option(w.Name, w.Name);
+                    }
+                }
+            };
+        }
+    </script>
+}

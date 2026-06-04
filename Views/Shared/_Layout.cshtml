@@ -1,0 +1,387 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - KIMI EXCLUSIVE</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #0f0f0f;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            color: #f0f0f0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .kimi-navbar {
+            background-color: #0b0b0b;
+            border-bottom: 1px solid #222;
+            transition: background-color 0.3s;
+        }
+
+        .nav-link {
+            color: #ccc !important;
+            font-weight: 500;
+            transition: 0.3s;
+            letter-spacing: 0.5px;
+        }
+
+            .nav-link:hover {
+                color: #ff5000 !important;
+            }
+
+        .search-box {
+            border-radius: 50px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .search-input {
+            background: #1a1a1a;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            outline: none;
+            box-shadow: none !important;
+            transition: 0.3s;
+        }
+
+            .search-input:focus {
+                background: #222;
+                color: white;
+            }
+
+        .search-btn {
+            background: #ff5000;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            transition: 0.3s;
+        }
+
+            .search-btn:hover {
+                background: #e64500;
+            }
+
+        .dropdown-menu-dark {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+        }
+
+        .dropdown-item-dark {
+            color: #ccc;
+            transition: 0.3s;
+        }
+
+            .dropdown-item-dark:hover {
+                background-color: #ff5000;
+                color: white;
+            }
+
+        .footer-link {
+            color: #6c757d;
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 13px;
+        }
+
+            .footer-link:hover {
+                color: #ff5000;
+            }
+
+
+        body.light-mode {
+            background-color: #f4f6f8 !important;
+            color: #212529 !important;
+        }
+
+            body.light-mode .kimi-navbar {
+                background-color: #ffffff !important;
+                border-bottom: 1px solid #e0e0e0 !important;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            }
+
+            body.light-mode .nav-link {
+                color: #495057 !important;
+            }
+
+                body.light-mode .nav-link:hover {
+                    color: #ff5000 !important;
+                }
+
+            body.light-mode .search-input {
+                background: #f1f3f5 !important;
+                color: #212529 !important;
+                border: 1px solid #ced4da !important;
+            }
+
+                body.light-mode .search-input:focus {
+                    background: #ffffff !important;
+                    border-color: #ff5000 !important;
+                }
+
+            body.light-mode .dropdown-menu-dark {
+                background-color: #ffffff !important;
+                border: 1px solid #e0e0e0 !important;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+            }
+
+            body.light-mode .dropdown-item-dark {
+                color: #212529 !important;
+            }
+
+                body.light-mode .dropdown-item-dark:hover {
+                    background-color: #fff4ed !important;
+                    color: #ff5000 !important;
+                }
+
+     
+            body.light-mode footer {
+                background-color: #ffffff !important;
+                border-top: 1px solid #e0e0e0 !important;
+            }
+
+                body.light-mode footer h5 {
+                    color: #212529 !important;
+                }
+
+                body.light-mode footer p {
+                    color: #6c757d !important;
+                }
+
+            body.light-mode .mascot-hero {
+                background: radial-gradient(circle at top, #ffffff 0%, #f1f3f5 70%) !important;
+                border-bottom: 1px solid #e0e0e0 !important;
+            }
+
+            body.light-mode .kimi-category-wrapper {
+                background-color: #ffffff !important;
+                border: 1px solid #e0e0e0 !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+            }
+
+            body.light-mode .kimi-category-item {
+                border-color: #e0e0e0 !important;
+                color: #495057 !important;
+            }
+
+                body.light-mode .kimi-category-item:hover {
+                    background-color: #fff4ed !important;
+                }
+
+            body.light-mode .kimi-category-img-circle {
+                background-color: #f1f3f5 !important;
+                border-color: #e0e0e0 !important;
+            }
+
+            body.light-mode .p-box {
+                background: #ffffff !important;
+                border: 1px solid #e0e0e0 !important;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.03) !important;
+            }
+
+            body.light-mode .p-img-wrapper {
+                background-color: #f4f6f8 !important;
+            }
+
+            body.light-mode .p-info h6 {
+                color: #212529 !important;
+            }
+
+            body.light-mode h4, body.light-mode h5 {
+                color: #212529 !important;
+            }
+
+                body.light-mode h4 i {
+                    color: #ff5000 !important;
+                }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg kimi-navbar py-3 sticky-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold fs-3" asp-area="Buyer" asp-controller="Home" asp-action="Index" style="color: #ff5000; letter-spacing: 2px;">
+                KIMI
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Buyer" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Buyer" asp-controller="Home" asp-action="Reels">
+                            <i class="bi bi-play-circle me-1"></i> VIDEO REELS
+                        </a>
+                    </li>
+                </ul>
+
+                <form class="d-flex mx-auto w-50 search-box" action="/Buyer/Home/Index" method="get">
+                    <input class="form-control search-input w-100" type="text" name="searchString" placeholder="Tìm kiếm bộ sưu tập...">
+                    <button class="search-btn" type="submit"><i class="bi bi-search"></i></button>
+                </form>
+
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown me-3">
+                            <a class="nav-link dropdown-toggle text-white d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle fs-5 me-2"></i>
+                                <span>@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow-lg rounded-3" style="min-width: 240px;">
+                                @if (User.IsInRole("Admin") || User.IsInRole("Seller"))
+                                {
+                                    <li><h6 class="dropdown-header fw-bold text-uppercase" style="letter-spacing: 1px;">Khu vực Seller</h6></li>
+                                    <li><a class="dropdown-item dropdown-item-dark py-2" asp-area="Seller" asp-controller="Product" asp-action="Index"><i class="bi bi-box-seam me-2"></i> Quản lý Sản phẩm</a></li>
+                                    <li><a class="dropdown-item dropdown-item-dark py-2" asp-area="Seller" asp-controller="Reel" asp-action="Index"><i class="bi bi-camera-video me-2"></i> Quản lý Video Reels</a></li>
+                                }
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <li><hr class="dropdown-divider border-secondary my-2"></li>
+                                    <li><h6 class="dropdown-header fw-bold text-uppercase" style="letter-spacing: 1px;">Khu vực Admin</h6></li>
+                                    <li><a class="dropdown-item dropdown-item-dark py-2" asp-area="Admin" asp-controller="Slider" asp-action="Index"><i class="bi bi-images me-2"></i> Quản lý Banner</a></li>
+                                    <li><a class="dropdown-item dropdown-item-dark py-2" asp-area="Admin" asp-controller="Category" asp-action="Index"><i class="bi bi-tags me-2"></i> Quản lý Danh mục</a></li>
+                                    <li><a class="dropdown-item dropdown-item-dark py-2 text-info fw-bold" asp-area="Admin" asp-controller="User" asp-action="Index"><i class="bi bi-people me-2"></i> Quản lý User</a></li>
+                                }
+                                <li><hr class="dropdown-divider border-secondary my-2"></li>
+                                <li>
+                                    <a class="dropdown-item dropdown-item-dark py-2 text-warning fw-bold" asp-area="Buyer" asp-controller="Order" asp-action="Index">
+                                        <i class="bi bi-receipt me-2"></i> Quản lý Đơn hàng
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider border-secondary my-2"></li>
+                                <li>
+                                    <form class="m-0 p-0" asp-area="Buyer" asp-controller="Account" asp-action="Logout" method="post">
+                                        <button type="submit" class="dropdown-item dropdown-item-dark py-2 text-danger fw-bold"><i class="bi bi-box-arrow-right me-2"></i> Đăng xuất</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item me-3">
+                            <a class="nav-link text-white" asp-area="Buyer" asp-controller="Account" asp-action="Login">ĐĂNG NHẬP</a>
+                        </li>
+                    }
+
+                    <li class="nav-item me-3 d-flex align-items-center">
+                        <button id="theme-toggle" class="btn btn-link nav-link text-warning p-0" title="Đổi giao diện Sáng/Tối">
+                            <i id="theme-icon" class="bi bi-moon-stars-fill fs-5"></i>
+                        </button>
+                    </li>
+
+                    <li class="nav-item me-3">
+                        <a class="nav-link text-info fw-bold" asp-area="Buyer" asp-controller="Chat" asp-action="Index">
+                            <i class="bi bi-chat-dots-fill me-1"></i> TIN NHẮN
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link text-warning fw-bold" asp-area="Buyer" asp-controller="Cart" asp-action="Index">
+                            <i class="bi bi-bag-fill me-1"></i> GIỎ HÀNG
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <a asp-area="Buyer" asp-controller="Account" asp-action="Register" class="text-decoration-none d-block w-100 position-relative overflow-hidden"
+           style="background: linear-gradient(135deg, #111111 0%, #2a0800 100%); border-bottom: 2px solid #ff5000; transition: 0.3s; cursor: pointer;"
+           onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+
+            <div class="position-absolute top-0 start-0 w-100 h-100" style="background-image: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070'); background-size: cover; background-position: center; opacity: 0.15;"></div>
+
+            <div class="container py-5 text-center position-relative" style="z-index: 1;">
+                <h1 class="fw-bold mb-3" style="color: #ffffff; font-family: 'Playfair Display', serif; letter-spacing: 1px;">
+                    MUA SẮM HÀNG NỘI ĐỊA <span style="color: #ff5000;">ĐỘC QUYỀN</span>
+                </h1>
+                <p class="text-light fs-5 mb-4 mx-auto" style="max-width: 800px;">
+                    Tại sao phải chần chừ khi bạn có thể sở hữu ngay những bộ sưu tập chất lượng nhất? Đăng ký tài khoản KIMI ngay hôm nay để nhận đặc quyền thành viên!
+                </p>
+                <span class="btn fw-bold px-5 py-3 shadow" style="background-color: #ffffff; color: #ff5000; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;"
+                      onmouseover="this.style.backgroundColor='#ff5000'; this.style.color='#ffffff'"
+                      onmouseout="this.style.backgroundColor='#ffffff'; this.style.color='#ff5000'">
+                    Đăng ký tài khoản ngay
+                </span>
+            </div>
+        </a>
+    }
+    <main role="main">
+        <partial name="_Notification" />
+        @RenderBody()
+    </main>
+
+    <footer class="border-top border-dark mt-5 py-5 text-center text-muted" style="background-color: #0b0b0b;">
+        <div class="container">
+            <h5 class="fw-bold text-white mb-3" style="font-family: 'Playfair Display', serif; letter-spacing: 2px;">KIMI EXCLUSIVE</h5>
+            <p class="small mb-3">&copy; @DateTime.Now.Year - Nâng tầm phong cách. Bản quyền thuộc về KIMI.</p>
+
+            <div class="d-flex justify-content-center align-items-center gap-3 mt-2">
+                <a asp-area="Buyer" asp-controller="Home" asp-action="Privacy" class="footer-link">Chính sách quyền riêng tư</a>
+                <span class="text-secondary opacity-25">|</span>
+                <a asp-area="Buyer" asp-controller="Home" asp-action="Contact" class="footer-link">Liên hệ hỗ trợ</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="chat-widget-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050;"></div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/chat.js"></script>
+
+    <script>
+        if (typeof signalR !== 'undefined') {
+            const connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+            connection.on("ReceiveMessage", function (user, message) {
+                toastr.info(user + " vừa nhắn tin cho bạn!", "Tin nhắn mới");
+            });
+            connection.start().catch(function (err) {
+                console.error("SignalR Connection Error: ", err.toString());
+            });
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const body = document.body;
+            const currentTheme = localStorage.getItem('kimi-theme');
+            if (currentTheme === 'light') {
+                body.classList.add('light-mode');
+                themeIcon.classList.replace('bi-moon-stars-fill', 'bi-sun-fill');
+            }
+
+            themeToggleBtn.addEventListener('click', function() {
+                body.classList.toggle('light-mode');
+
+                if (body.classList.contains('light-mode')) {
+                    localStorage.setItem('kimi-theme', 'light');
+                    themeIcon.classList.replace('bi-moon-stars-fill', 'bi-sun-fill');
+                } else {
+                    localStorage.setItem('kimi-theme', 'dark');
+                    themeIcon.classList.replace('bi-sun-fill', 'bi-moon-stars-fill');
+                }
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,328 @@
+﻿@using ĐồÁnCơSở.Models
+@model ĐồÁnCơSở.Models.ProductListVM
+
+<style>
+    /* 1. MASCOT HERO */
+    .mascot-hero {
+        background: radial-gradient(circle at top, #1f1f1f 0%, #0f0f0f 70%);
+        padding: 50px 0 30px; 
+        text-align: center;
+        border-bottom: 1px solid #222;
+    }
+    .mascot-main {
+        width: 100%; 
+        max-width: 600px; 
+        filter: drop-shadow(0 0 40px rgba(255, 80, 0, 0.4));
+        animation: floatAnim 4s ease-in-out infinite;
+        margin-bottom: 15px;
+    }
+    .hero-title {
+        color: #ff5000; 
+        text-shadow: 0 4px 15px rgba(255,80,0,0.5);
+        letter-spacing: 2px;
+        font-weight: 800;
+    }
+
+    @Html.Raw("@keyframes floatAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }")
+
+    /* 2. BANNER SLIDER */
+    .banner-wrapper { padding: 40px 0 20px; }
+    .banner-container { 
+        border-radius: 20px; 
+        overflow: hidden; 
+        border: 1px solid #333; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+    .carousel-item img { height: 380px; object-fit: cover; }
+
+    /* 3. LƯỚI DANH MỤC SHOPEE STYLE */
+    .kimi-category-wrapper {
+        background-color: #161616;
+        border-radius: 16px;
+        border: 1px solid #222;
+        overflow: hidden;
+    }
+    .kimi-category-item {
+        border-right: 1px solid #222;
+        border-bottom: 1px solid #222;
+        text-align: center;
+        padding: 20px 5px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        display: block;
+        height: 100%;
+        color: #b0b0b0;
+    }
+    .col-category:nth-child(6n) .kimi-category-item { border-right: none; }
+    .kimi-category-item:hover {
+        background-color: #1f1f1f;
+        box-shadow: 0 0 15px rgba(255, 80, 0, 0.15);
+        color: #ff5000;
+        z-index: 1;
+        position: relative;
+    }
+    .kimi-category-img-circle {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 10px auto;
+        border-radius: 50%;
+        background-color: #111;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 2px solid transparent;
+        transition: 0.3s;
+    }
+    .kimi-category-item:hover .kimi-category-img-circle {
+        border-color: #ff5000;
+        transform: scale(1.05);
+    }
+    .kimi-category-img-circle img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .kimi-category-title {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* 4. KIMI SHORTS */
+    .reel-strip { display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; padding-bottom: 15px; }
+    .reel-strip::-webkit-scrollbar { display: none; }
+    .reel-card-home {
+        min-width: 180px; height: 320px; border-radius: 16px;
+        overflow: hidden; position: relative; border: 2px solid #222; transition: all 0.3s;
+    }
+    .reel-card-home:hover { border-color: #ff5000; transform: translateY(-8px); box-shadow: 0 10px 20px rgba(255,80,0,0.3); }
+
+    /* 5. KHUNG SẢN PHẨM CHỐNG GIÃN ẢNH */
+    .p-box { 
+        background: #121212; border: 1px solid #222; border-radius: 16px; 
+        overflow: hidden; transition: all 0.3s ease; height: 100%; display: flex; flex-direction: column;
+    }
+    .p-box:hover { border-color: #ff5000; transform: translateY(-5px); box-shadow: 0 8px 20px rgba(255,80,0,0.15); }
+    
+    .p-img-wrapper {
+        position: relative;
+        width: 100%;
+        padding-top: 100%; 
+        background-color: #1a1a1a;
+        overflow: hidden;
+    }
+    .p-img-wrapper img {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        object-fit: cover; 
+        transition: transform 0.5s;
+    }
+    .p-box:hover .p-img-wrapper img { transform: scale(1.08); }
+    
+    .p-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+
+    /* 6. THANH PHÂN TRANG (PAGINATION) */
+    .kimi-pagination .page-link {
+        background-color: #1a1a1a;
+        border-color: #333;
+        color: #ccc;
+        transition: 0.3s;
+        margin: 0 4px;
+        border-radius: 8px;
+    }
+    .kimi-pagination .page-link:hover {
+        background-color: #2a2a2a;
+        color: #ff5000;
+    }
+    .kimi-pagination .page-item.active .page-link {
+        background-color: #ff5000;
+        border-color: #ff5000;
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(255,80,0,0.3);
+    }
+    .kimi-pagination .page-item.disabled .page-link {
+        background-color: #0f0f0f;
+        border-color: #222;
+        color: #555;
+    }
+</style>
+
+<div class="mascot-hero">
+    <div class="container">
+        <img src="/Images/mascot.png" class="mascot-main" onerror="this.src='https://cdn-icons-png.flaticon.com/512/6134/6134065.png'">
+        <h1 class="display-3 hero-title">KIMI EXCLUSIVE</h1>
+        <p class="text-secondary fs-5 mt-2">Đỉnh cao mua sắm - Cháy cùng đam mê</p>
+    </div>
+</div>
+
+<div class="banner-wrapper">
+    <div class="container">
+        <div class="banner-container">
+            <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @if (ViewBag.SliderList is IEnumerable<Slider> sliders && sliders.Any())
+                    {
+                        int i = 0;
+                        foreach (var s in sliders) 
+                        {
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@s.ImageUrl" class="d-block w-100" alt="banner">
+                            </div>
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        <div class="carousel-item active">
+                            <img src="https://via.placeholder.com/1200x380/111/fff?text=KIMI+-+Cho+Banner+Moi" class="d-block w-100">
+                        </div>
+                    }
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    
+    <div class="mb-5">
+        <h5 class="fw-bold m-0 mb-3" style="color: #ccc; letter-spacing: 1px;">
+            <i class="bi bi-grid-fill me-2" style="color: #ff5000;"></i> DANH MỤC NỔI BẬT
+        </h5>
+        
+        <div class="row g-0 kimi-category-wrapper shadow-lg">
+            @if (ViewBag.CategoryList is IEnumerable<Category> categories && categories.Any())
+            {
+                foreach (var cat in categories)
+                {
+                    <div class="col-4 col-md-3 col-lg-2 col-category">
+                        <a href="/Buyer/Home/Index?categoryId=@cat.Id" class="kimi-category-item">
+                            <div class="kimi-category-img-circle">
+                                <img src="@(string.IsNullOrEmpty(cat.ImageUrl) ? "https://via.placeholder.com/150/111/ff5000?text=KIMI" : cat.ImageUrl)" alt="@cat.Name">
+                            </div>
+                            <div class="kimi-category-title">@cat.Name</div>
+                        </a>
+                    </div>
+                }
+                
+                int count = categories.Count();
+                int emptyCells = (6 - (count % 6)) % 6; 
+                for (int j = 0; j < emptyCells; j++)
+                {
+                    <div class="col-4 col-md-3 col-lg-2 col-category d-none d-md-block">
+                        <div class="kimi-category-item" style="cursor: default;"></div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 py-4 text-center text-muted fst-italic">
+                    Chưa có danh mục nào.
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold m-0"><i class="bi bi-play-btn-fill text-danger me-2"></i>KIMI SHORTS</h4>
+            <a asp-action="Reels" class="text-decoration-none fw-bold" style="color: #ff5000;">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="reel-strip">
+            @if (ViewBag.ReelsList is IEnumerable<Reel> reels && reels.Any())
+            {
+                foreach (var reel in reels)
+                {
+                    <div class="reel-card-home">
+                        <a asp-action="Reels">
+                            <video muted loop onmouseover="this.play()" onmouseout="this.pause()" class="w-100 h-100" style="object-fit: cover;">
+                                <source src="@reel.VideoUrl" type="video/mp4">
+                            </video>
+                        </a>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-muted fst-italic">Chưa có video Shorts nào.</div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold m-0"><i class="bi bi-box-seam text-danger me-2"></i>TẤT CẢ SẢN PHẨM</h4>
+            </div>
+            
+            <div class="row g-4">
+                @if (Model.Products != null && Model.Products.Any())
+                {
+                    foreach (var p in Model.Products)
+                    {
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="p-box">
+                                <a asp-action="Details" asp-controller="Home" asp-area="Buyer" asp-route-productId="@p.Id" class="text-decoration-none">
+                                    <div class="p-img-wrapper">
+                                        <img src="@p.ImageUrl" onerror="this.src='/images/no-image.png'" alt="@p.Name">
+                                    </div>
+                                    <div class="p-info">
+                                        <h6 class="text-white fw-bold mb-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">@p.Name</h6>
+                                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                                            <span class="text-danger fw-bold fs-5">@p.Price.ToString("N0") ₫</span>
+                                            <i class="bi bi-cart-plus text-secondary fs-5"></i>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-box-seam text-secondary" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3 fs-5">Kệ hàng đang trống, đợi Trâm nhập hàng về...</p>
+                    </div>
+                }
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <div class="mt-5 d-flex justify-content-center">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-lg kimi-pagination">
+                            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                                <a class="page-link" href="/Buyer/Home/Index?productPage=@(Model.CurrentPage - 1)&categoryId=@Model.CategoryId&searchString=@Model.SearchString" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                                    <a class="page-link" href="/Buyer/Home/Index?productPage=@i&categoryId=@Model.CategoryId&searchString=@Model.SearchString">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="/Buyer/Home/Index?productPage=@(Model.CurrentPage + 1)&categoryId=@Model.CategoryId&searchString=@Model.SearchString" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+            </div>
+    </div>
+</div>

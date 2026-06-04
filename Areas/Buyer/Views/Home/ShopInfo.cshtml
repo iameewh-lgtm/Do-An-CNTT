@@ -1,0 +1,62 @@
+﻿@model IEnumerable<ĐồÁnCơSở.Models.Product>
+
+@{
+    ViewData["Title"] = "Cửa hàng của " + ViewBag.ShopName;
+}
+
+<div class="container mt-4">
+    <div class="card border-0 rounded-4 shadow-sm mb-5 overflow-hidden">
+        <div class="bg-dark" style="height: 120px; background: linear-gradient(135deg, #111 0%, #333 100%);"></div>
+        <div class="card-body px-5 pb-4 d-flex align-items-end" style="margin-top: -60px;">
+            <div class="rounded-circle bg-white p-2 shadow" style="width: 120px; height: 120px; border: 1px solid #eaeaea;">
+                <div class="w-100 h-100 rounded-circle bg-light d-flex align-items-center justify-content-center">
+                    <i class="bi bi-shop text-dark fs-1"></i>
+                </div>
+            </div>
+            <div class="ms-4 mb-2">
+                <h2 class="fw-bold mb-1" style="font-family: 'Playfair Display', serif; letter-spacing: 1px;">KIMI SHOP</h2>
+                <h5 class="text-muted mb-2">Chủ cửa hàng: <span class="text-dark fw-bold">@ViewBag.ShopName</span></h5>
+                <a href="/Buyer/Chat/Index?userId=@ViewBag.SellerId" class="btn btn-outline-dark rounded-pill px-4 py-1 btn-sm fw-semibold">
+                    <i class="bi bi-chat-dots me-1"></i> Trò chuyện
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold mb-4 text-uppercase" style="letter-spacing: 1px;"><i class="bi bi-box-seam me-2"></i> TẤT CẢ SẢN PHẨM CỦA SHOP</h4>
+    
+    <div class="row g-4">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var product in Model)
+            {
+                <div class="col-md-3 col-lg-2">
+                    <a asp-area="Buyer" asp-controller="Home" asp-action="Details" asp-route-productId="@product.Id" class="text-decoration-none text-dark d-block">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 transition-hover">
+                            <img src="@product.ImageUrl" class="card-img-top rounded-top-4" style="height: 220px; object-fit: cover;" onerror="this.src='/images/no-image.png'" />
+                            <div class="card-body p-3">
+                                <h6 class="card-title text-truncate" style="font-size: 14px;">@product.Name</h6>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <span class="fw-bold fs-5" style="color: #111;">@product.Price.ToString("N0")₫</span>
+                                    <span class="badge bg-light text-dark border fw-normal" style="font-size: 10px;">Bán @product.SoldQuantity</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                <p class="mt-3 text-muted">Shop này hiện chưa đăng sản phẩm nào.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .transition-hover { transition: all 0.3s ease; }
+    .transition-hover:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.06) !important; }
+</style>

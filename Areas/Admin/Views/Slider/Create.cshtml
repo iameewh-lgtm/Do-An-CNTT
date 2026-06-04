@@ -1,0 +1,37 @@
+﻿@model ĐồÁnCơSở.Models.Slider
+
+<div class="container bg-white p-5 shadow-sm mt-4 rounded" style="max-width: 800px;">
+    <h2 class="text-taobao fw-bold mb-4 text-center">THÊM BANNER MỚI</h2>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <div class="mb-4">
+            <label class="form-label fw-bold">Tiêu đề Banner</label>
+            <input asp-for="Title" class="form-control form-control-lg border-2" placeholder="Nhập tiêu đề hiển thị..." />
+            <span asp-validation-for="Title" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-bold">Hình ảnh Banner (Nên chọn ảnh ngang 1200x500)</label>
+            <input type="file" name="file" class="form-control border-2" accept="image/*" />
+        </div>
+
+        <div class="row pt-2">
+            <div class="col-6">
+                <button type="submit" class="btn bg-taobao w-100 py-3 fw-bold text-uppercase shadow-sm">
+                    <i class="bi bi-cloud-arrow-up"></i> Lưu Banner
+                </button>
+            </div>
+            <div class="col-6">
+                <a asp-action="Index" class="btn btn-outline-secondary w-100 py-3 fw-bold text-uppercase shadow-sm">
+                    Quay lại
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

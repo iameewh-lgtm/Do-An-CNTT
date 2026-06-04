@@ -1,0 +1,73 @@
+﻿@model ĐồÁnCơSở.Models.Reel
+
+<div class="container mt-4 mb-5">
+    <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white py-3">
+            <h3 class="mb-0 text-center">@(Model.Id != 0 ? "Cập nhật Video" : "Đăng Video Shorts mới")</h3>
+        </div>
+        <div class="card-body p-4 bg-light">
+            <form method="post" enctype="multipart/form-data">
+                <input asp-for="Id" hidden />
+                <input asp-for="VideoUrl" hidden />
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tiêu đề Video </label>
+                            <input asp-for="Title" class="form-control border-primary" placeholder="Ví dụ: Đập hộp iPhone 17 siêu mượt..." />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Sản phẩm muốn bán (Gắn link)</label>
+                            <select asp-for="ProductId" asp-items="ViewBag.ProductList" class="form-select border-primary">
+                                <option disabled selected>-- Chọn sản phẩm để chốt đơn --</option>
+                            </select>
+                            <span asp-validation-for="ProductId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mô tả thêm (Hông bắt buộc)</label>
+                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-danger">Upload File Video (.mp4)</label>
+                            <input type="file" name="file" class="form-control form-control-lg border-danger" accept="video/mp4,video/x-m4v,video/*" />
+                            <small class="text-muted">Chọn clip mượt mượt xíu, tỷ lệ 9:16 (dọc) coi cho đã mắt nhen.</small>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn text-white px-5 py-2 fw-bold shadow" style="background-color: #ff5000;">
+                                @(Model.Id != 0 ? "LƯU THAY ĐỔI" : "ĐĂNG VIDEO LÊN")
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary px-5 py-2 fw-bold ms-2">HỦY</a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 text-center">
+                        @if (Model.Id != 0 && !string.IsNullOrEmpty(Model.VideoUrl))
+                        {
+                            <h6 class="fw-bold text-success mb-3">Video hiện tại nè bạn:</h6>
+                            <video width="100%" controls class="rounded shadow border border-2 border-dark" style="max-height: 400px; background: #000;">
+                                <source src="@Model.VideoUrl" type="video/mp4">
+                                Trình duyệt của bạn cùi bắp quá hông coi được clip này rồi.
+                            </video>
+                        }
+                        else
+                        {
+                            <div class="p-5 border rounded bg-white text-muted mt-4" style="border-style: dashed !important;">
+                                <i class="bi bi-camera-reels" style="font-size: 3rem;"></i><br />
+                                <span>Chưa có video nào. Chọn file up lên đi!</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

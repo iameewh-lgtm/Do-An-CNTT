@@ -1,0 +1,35 @@
+﻿@model IEnumerable<ĐồÁnCơSở.Models.Category>
+
+<div class="container bg-white p-4 shadow-sm mt-4 rounded">
+    <div class="row align-items-center">
+        <div class="col-6">
+            <h2 class="text-taobao fw-bold mb-0">QUẢN LÝ DANH MỤC</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-action="Create" class="btn bg-taobao px-4 py-2 fw-bold">
+                <i class="bi bi-plus-circle"></i> THÊM DANH MỤC MỚI
+            </a>
+        </div>
+    </div>
+    <hr class="my-4">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Tên danh mục</th>
+                <th class="text-center">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var obj in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@obj.Name</td>
+                    <td class="text-center">
+                        <a asp-action="Edit" asp-route-id="@obj.Id" class="btn btn-outline-primary btn-sm mx-1">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@obj.Id" class="btn btn-outline-danger btn-sm mx-1">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

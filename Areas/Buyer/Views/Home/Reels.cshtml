@@ -1,0 +1,153 @@
+﻿@model List<ĐồÁnCơSở.Models.Reel>
+
+@{
+    ViewData["Title"] = "KIMI SHORTS";
+}
+<style>
+    body { background-color: #0b0b0b; }
+
+    .reels-page {
+        padding: 20px 0;
+        min-height: calc(100vh - 150px);
+        display: flex; flex-direction: column; align-items: center;
+    }
+    
+    .reels-mascot {
+        width: 150px; 
+        filter: drop-shadow(0 0 10px rgba(255, 80, 0, 0.5));
+        margin-bottom: 20px;
+    }
+
+    .reels-container {
+        width: 100%; max-width: 420px; height: 85vh;
+        overflow-y: scroll; scroll-snap-type: y mandatory;
+        border-radius: 30px; box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        background: #000; border: 4px solid #222;
+        -ms-overflow-style: none; scrollbar-width: none;
+    }
+    .reels-container::-webkit-scrollbar { display: none; }
+
+    .reel-item {
+        width: 100%; height: 100%;
+        position: relative; scroll-snap-align: start;
+        background-color: #000;
+        display: flex; align-items: center; /* Giúp video ngang nằm giữa màn hình dọc */
+        justify-content: center;
+    }
+
+    /* 🛑 CHỖ FIX TỈ LỆ VIDEO ĐÂY 🛑 */
+    .reel-video {
+        width: 100%; 
+        height: 100%; 
+        object-fit: contain; /* ÉP GIỮ TỈ LỆ GỐC, KHÔNG BỊ MÉO */
+        cursor: pointer;
+        background-color: #000; /* Nền đen để lấp viền thừa */
+    }
+
+    .reel-info {
+        position: absolute; bottom: 0; left: 0; width: 100%;
+        padding: 100px 20px 30px;
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 20%, transparent);
+        color: #fff; pointer-events: none;
+    }
+
+    .reel-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; color: #ff5000; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+    .reel-desc { font-size: 0.95rem; margin-bottom: 20px; opacity: 0.8; }
+
+    .product-card {
+        background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); 
+        padding: 12px; border-radius: 15px; display: flex; align-items: center;
+        pointer-events: auto; text-decoration: none !important; color: #fff !important;
+        transition: all 0.3s; border: 1px solid rgba(255,255,255,0.2);
+    }
+    .product-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.2); border-color: #ff5000; }
+    .product-card img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; margin-right: 15px; }
+    .product-name { font-size: 0.9rem; font-weight: bold; margin: 0; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+    .product-price { color: #ff5000; font-weight: bold; margin: 0; font-size: 1rem; }
+    .btn-buy-now { background: #ff5000; color: #fff; padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; border: none; margin-left: 10px; box-shadow: 0 4px 10px rgba(255,80,0,0.3); }
+    
+    .mute-icon {
+        position: absolute; top: 25px; right: 25px; color: white; font-size: 20px; z-index: 10;
+        background: rgba(0,0,0,0.4); border-radius: 50%; width: 45px; height: 45px;
+        display: flex; align-items: center; justify-content: center; pointer-events: none; border: 1px solid rgba(255,255,255,0.1);
+    }
+</style>
+
+<div class="reels-page">
+    <img src="/Images/mascot.png" class="reels-mascot" onerror="this.style.display='none'">
+    
+    <div class="reels-container">
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var item in Model)
+            {
+                <div class="reel-item">
+                    <div class="mute-icon"><i class="bi bi-volume-mute-fill"></i></div>
+                    <video class="reel-video" loop muted playsinline>
+                        <source src="@item.VideoUrl" type="video/mp4">
+                    </video>
+                    <div class="reel-info">
+                        <div class="reel-title">@item.Title</div>
+                        <div class="reel-desc">@item.Description</div>
+                        
+                        <a asp-area="Buyer" asp-controller="Home" asp-action="Details" asp-route-productId="@item.ProductId" class="product-card">
+                            <img src="@item.Product.ImageUrl" onerror="this.src='/images/no-image.png'">
+                            <div class="product-details" style="flex-grow: 1; min-width: 0;">
+                                <p class="product-name">@item.Product.Name</p>
+                                <p class="product-price">@item.Product.Price.ToString("N0") đ</p>
+                            </div>
+                            <div class="btn-buy-now">Xem ngay</div>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-white text-center p-5 mt-5">
+                <i class="bi bi-camera-video-off" style="font-size: 3rem; color: #ff5000;"></i>
+                <h4 class="mt-3 text-white">Chưa có Kimi Shorts nào!</h4>
+                <p class="text-muted small">Hãy vào trang Seller để đăng video review sản phẩm nhé.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const videos = document.querySelectorAll('.reel-video');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.play().catch(e => console.log("Lỗi autoplay:", e));
+                    } else {
+                        entry.target.pause();
+                        entry.target.currentTime = 0;
+                    }
+                });
+            }, { threshold: 0.6 });
+
+            videos.forEach(video => {
+                observer.observe(video);
+
+                video.addEventListener('click', function () {
+                    let icon = this.parentElement.querySelector('.mute-icon i');
+
+                    if (this.muted) {
+                        this.muted = false;
+                        icon.classList.remove('bi-volume-mute-fill');
+                        icon.classList.add('bi-volume-up-fill');
+                    } else {
+                        if (this.paused) {
+                            this.play();
+                        } else {
+                            this.pause();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

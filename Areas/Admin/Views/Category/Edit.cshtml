@@ -1,0 +1,25 @@
+﻿@model ĐồÁnCơSở.Models.Category
+
+<form method="post">
+    <input asp-for="Id" hidden />
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">Sửa Danh Mục</h2>
+            <hr />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Name">Tên danh mục</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ImageUrl">Đường dẫn ảnh (URL)</label>
+            <input asp-for="ImageUrl" class="form-control" placeholder="Dán link ảnh mới vào đây..." />
+            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:150px">Cập nhật</button>
+        <a asp-controller="Category" asp-action="Index" class="btn btn-secondary" style="width:150px">Quay Lại</a>
+    </div>
+</form>
